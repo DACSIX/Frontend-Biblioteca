@@ -19,8 +19,11 @@ import MediaPage from '@/pages/admin/MediaPage'
 import { ProtectedRoute, RoleGuard } from '@/auth/guards'
 
 export const router = createBrowserRouter([
+    // Rutas públicas (sin autenticación)
     { path: '/login', element: <LoginPage /> },
     { path: '/register', element: <RegisterPage /> },
+
+    // Rutas protegidas (usuario autenticado)
     {
         element: <ProtectedRoute />,
         children: [
@@ -31,21 +34,43 @@ export const router = createBrowserRouter([
                     { path: '/me', element: <ProfilePage /> },
                     { path: '/catalogo', element: <CatalogoPage /> },
                     { path: '/libros/:id', element: <LibroDetallePage /> },
+                ],
+            },
+
+            //Rutas del rol USUARIO
+            {
+                element: <RoleGuard roles={['usuario']} />,
+                children: [
                     { path: '/mis-reservas', element: <MisReservasPage /> },
                     { path: '/mis-prestamos', element: <MisPrestamosPage /> },
                     { path: '/mis-multas', element: <MisMultasPage /> },
                 ],
             },
+
+            //Rutas del rol BIBLIOTECARIO
             {
-                element: <RoleGuard roles={['ADMIN', 'BIBLIOTECARIO']} />,
+                element: <RoleGuard roles={['bibliotecario']} />,
+                children: [
+                    {
+                        element: <AdminLayout />,
+                        children: [
+                            { path: '/admin/reservas', element: <ReservasPage /> },
+                            { path: '/admin/prestamos', element: <PrestamosPage /> },
+                            { path: '/admin/multas', element: <MultasPage /> },
+                            { path: '/admin/libros', element: <LibrosPage /> }
+                        ],
+                    },
+                ],
+            },
+
+            // Rutas del rol ADMIN
+            {
+                element: <RoleGuard roles={['admin']} />,
                 children: [
                     {
                         element: <AdminLayout />,
                         children: [
                             { path: '/admin/libros', element: <LibrosPage /> },
-                            { path: '/admin/reservas', element: <ReservasPage /> },
-                            { path: '/admin/prestamos', element: <PrestamosPage /> },
-                            { path: '/admin/multas', element: <MultasPage /> },
                             { path: '/admin/usuarios', element: <UsuariosPage /> },
                             { path: '/admin/media', element: <MediaPage /> },
                         ],
@@ -55,3 +80,4 @@ export const router = createBrowserRouter([
         ],
     },
 ])
+
